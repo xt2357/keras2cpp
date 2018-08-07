@@ -202,6 +202,11 @@ keras::DataChunk* keras::LayerActivation::compute_output(keras::DataChunk* dc) {
         if(y[k] < 0) y[k] = 0;
       }
     } else if(m_activation_type == "softmax") {
+      // avoid overflows
+      auto max_y = *std::max_element(y.begin(), y.end());
+      for (auto &num : y) {
+        num -= max_y;
+      }
       float sum = 0.0;
       for(unsigned int k = 0; k < y.size(); ++k) {
         y[k] = exp(y[k]);
